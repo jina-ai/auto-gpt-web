@@ -1,8 +1,9 @@
 <template>
   <q-page class="column items-center justify-evenly">
-    <h3 class="title">
-      <strong>Run GPT-4 Autonomously</strong>
-    </h3>
+    <header class="header">
+      <div class="title">Accomplish Task Autonomously</div>
+      <div class="description">Your AI assistant will recursively use tools (e.g. search...) to achieve your goals as much as possible.</div>
+    </header>
     <q-card>
       <q-card-section>
         <span>Define your AI assistant</span>
@@ -79,6 +80,22 @@ const run = () => {
 
   .q-input {
     margin: 0.5rem;
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  .description {
+    font-size: 1rem;
   }
 }
 
