@@ -1,4 +1,4 @@
-# Auto-GPT-web: An Website allows GPT-4 run autonomously 🤖
+# Auto-GPT-web: An Website allows GPT-4 to run autonomously 🤖
 
 Run GPT-4 autonomously on the web. Inspired by [Auto-GPT](https://github.com/Torantulino/Auto-GPT).
 

@@ -1,7 +1,7 @@
 {
   "name": "auto-gpt-web",
   "version": "0.0.1",
-  "description": "An Website allows GPT-4 run autonomously",
+  "description": "An Website allows GPT-4 to run autonomously",
   "productName": "AutoGPTWeb",
   "author": "Zhaofeng Miao <522856232@qq.com>",
   "private": true,
