@@ -7,17 +7,17 @@
     <q-card>
       <q-card-section>
         <span>Define your AI assistant</span>
-        <q-input filled v-model="name" label="Name" :placeholder="DEMO.name" hint="Give your AI an meaningful name" :hide-hint="true" />
-        <q-input filled v-model="role" label="Role" :placeholder="DEMO.role" hint="Describe the role of your AI" :hide-hint="true" />
+        <q-input filled v-model="name" label="Name" :placeholder="demo.name" hint="Give your AI an meaningful name" :hide-hint="true" />
+        <q-input filled v-model="role" label="Role" :placeholder="demo.role" hint="Describe the role of your AI" :hide-hint="true" />
         <span>Define major goals of your AI assistant</span>
         <div class="goal" v-for="(goal, index) in goals" :key="`goal_${index}`">
           <q-input filled v-model="goals[index]" :label="`Goal ${index + 1}`" />
-          <q-icon size="1.6rem" color="primary" name="add_circle_outline" @click="addGoal()"></q-icon>
-          <q-icon size="1.6rem" color="red" name="remove_circle_outline" v-show="goals.length > 1" @click="removeGoal(index)"></q-icon>
+          <q-icon size="1.6rem" color="primary" name="add_circle_outline" @click="assistantStore.addGoal()"></q-icon>
+          <q-icon size="1.6rem" color="red" name="remove_circle_outline" v-show="goals.length > 1" @click="assistantStore.removeGoal(index)"></q-icon>
         </div>
       </q-card-section>
       <q-card-actions align="around">
-        <q-btn flat color="secondary" title="Fill in demo values" @click="fillIn">Demo values</q-btn>
+        <q-btn flat color="secondary" title="Fill in demo values" @click="assistantStore.setDemoAssistant()">Demo values</q-btn>
         <q-btn flat color="primary" title="Run the task" @click="run">Run</q-btn>
       </q-card-actions>
     </q-card>
@@ -25,41 +25,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useAssistantStore } from '../stores/assistant';
 
-const DEMO = {
-  name: 'Entrepreneur-GPT',
-  role: 'an AI designed to autonomously develop and run business with the sole goal of increasing your net worth.',
-  goals: [
-    'Invent an original and out-of-the-box recipe to suit a current event, such as Easter.',
-    'Save the resulting recipe to a file.',
-    'Shutdown upon achieving the goal.'
-  ]
-}
-
-const name = ref('');
-const role = ref('');
-const goals = ref<string[]>(['']);
-
-const addGoal = () => {
-  goals.value.push('');
-}
-
-const removeGoal = (index: number) => {
-  goals.value.splice(index, 1);
-}
-
-const fillIn = () => {
-  name.value = DEMO.name;
-  role.value = DEMO.role;
-  goals.value = DEMO.goals;
-}
+const assistantStore = useAssistantStore();
+const { name, role, goals, demo } = storeToRefs(assistantStore);
 
 const run = () => {
+  // Save assistant configuration
+  assistantStore.setAssistant({
+    name: name.value,
+    role: role.value,
+    goals: goals.value
+  });
+
   // TODO: implement
-  console.log(`name: ${name.value}`);
-  console.log(`role: ${role.value}`);
-  console.log(`goals: ${goals.value}`);
 }
 </script>
 
