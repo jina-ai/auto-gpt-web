@@ -2,10 +2,9 @@
   <router-view />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-export default defineComponent({
-  name: 'App'
-});
+dayjs.extend(relativeTime);
 </script>

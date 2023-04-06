@@ -1,46 +1,59 @@
 <template>
   <q-page class="column items-center justify-evenly">
     <div class="container">
-      <q-chat-message
-        name="me"
-        avatar="https://cdn.quasar.dev/img/avatar1.jpg"
-        sent
-        stamp="now"
-        size="8"
-      >
+      <q-chat-message v-for="{ id, role, content, stamp } in historyStore.list" :key="id" :name="roleToDisplayName[role]"
+        :avatar="roleToAvatarLink[role]" :sent="role === 'user'" :stamp="dayjs(stamp).fromNow()" size="8">
         <!-- TODO: render in a nicer way -->
-        <div>{{  prompt }}</div>
+        <div>{{ content }}</div>
       </q-chat-message>
-      <q-chat-message
-        :name="assistantStore.name"
-        avatar="https://cdn.quasar.dev/img/avatar2.jpg"
-        :text="[result]"
-        stamp="now"
-        size="8"
-      />
+
+      <!-- Waiting status -->
+      <q-chat-message v-if="waiting" :name="assistantStore.name" :avatar="roleToAvatarLink['assistant']">
+        <q-spinner-dots size="2rem" />
+      </q-chat-message>
     </div>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, h } from 'vue';
+import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import dayjs from 'dayjs';
+
 import { chat } from '../ai';
 import { useAssistantStore } from '../stores/assistant';
+import { useHistoryStore } from '../stores/history';
 
 const assistantStore = useAssistantStore();
+const historyStore = useHistoryStore();
 const { prompt } = storeToRefs(assistantStore);
 
-const result = ref<string | undefined>(undefined);
+const waiting = ref(false);
 
 onMounted(async () => {
-  result.value = await chat({
+  historyStore.clear();
+
+  waiting.value = true;
+  await chat({
     prompt: prompt.value,
     userInput: 'Determine which next command to use, and respond using the format specified above:',
     fullMessageHistory: [],
     permanentMemory: [],
   });
+  waiting.value = false;
 })
+
+const roleToDisplayName = {
+  user: 'me',
+  system: 'system',
+  assistant: assistantStore.name,
+}
+
+const roleToAvatarLink = {
+  user: 'https://cdn.quasar.dev/img/avatar1.jpg',
+  system: 'https://cdn.quasar.dev/img/avatar2.jpg',
+  assistant: 'https://cdn.quasar.dev/img/avatar3.jpg',
+}
 </script>
 
 <style scoped lang="scss">
