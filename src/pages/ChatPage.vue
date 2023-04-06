@@ -18,12 +18,14 @@
 import { onMounted } from 'vue';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar'
 
 import { exec } from '../cmds';
 import { useAssistantStore } from '../stores/assistant';
 import { useChatStore } from '../stores/chat';
 import ChatItem from '../components/ChatItem.vue';
 
+const $q = useQuasar()
 const router = useRouter();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
@@ -40,20 +42,35 @@ if (!chatStore.hasHistory) {
 
 let a = 3;
 onMounted(async () => {
-  const raw = await chatStore.chat();
+  try {
+    const raw = await chatStore.chat();
 
-  while (a > 0) {
-    const result = await exec(raw);
+    while (a > 0) {
+      const result = await exec(raw);
 
-    await chatStore.chat([{
-      role: 'system',
-      content: result ? `Command returned: ${result}` : 'Unable to execute command',
-    }, {
-      role: 'user',
-      content: 'Determine which next command to use, and respond using the format specified above:',
-    }])
+      await chatStore.chat([{
+        role: 'system',
+        content: result ? `Command returned: ${result}` : 'Unable to execute command',
+      }, {
+        role: 'user',
+        content: 'Determine which next command to use, and respond using the format specified above:',
+      }])
 
-    a--;
+      a--;
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      $q.notify({
+        type: 'negative',
+        message: e.message,
+      });
+      return;
+    }
+
+    $q.notify({
+      type: 'negative',
+      message: `Unknown error: ${e}`,
+    });
   }
 })
 
@@ -71,6 +88,10 @@ const roleToAvatarLink = {
 </script>
 
 <style scoped lang="scss">
+.q-page {
+  padding: 1.25rem
+}
+
 .container {
   @media screen and (max-width: 1024px) {
     width: 100%;

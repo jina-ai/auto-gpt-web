@@ -2,13 +2,7 @@ import { defineStore } from 'pinia';
 import { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
-// TODO: allow user add keys on the webpage and save it to local storage
-import { OPENAI_API_KEY } from '../../keys.json';
-
-const configuration = new Configuration({
-  apiKey: OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+import { useCredentialStore } from './credential';
 
 interface HistoryItem {
   id: string;
@@ -18,6 +12,7 @@ interface HistoryItem {
 }
 
 interface Chat {
+  openai?: OpenAIApi;
   thinking: boolean;
   history: HistoryItem[];
 }
@@ -51,6 +46,18 @@ export const useChatStore = defineStore('chat', {
   },
   actions: {
     async chat(list?: { role: ChatCompletionRequestMessageRoleEnum, content: string }[]) {
+      if (!this.openai) {
+        const credentialStore = useCredentialStore();
+        if (credentialStore.requireOpenAICredential) {
+          throw Error('OpenAI API key is not set');
+        }
+
+        const configuration = new Configuration({
+          apiKey: credentialStore.openai,
+        });
+        this.openai = new OpenAIApi(configuration);
+      }
+
       list?.forEach(({ role, content }) => {
         this.addHistoryItem({
           role,
@@ -61,7 +68,7 @@ export const useChatStore = defineStore('chat', {
 
       this.thinking = true;
       try {
-        const result = await openai.createChatCompletion({
+        const result = await this.openai.createChatCompletion({
           model: 'gpt-3.5-turbo',
           messages: this.context,
           // TODO:

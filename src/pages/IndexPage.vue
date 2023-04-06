@@ -26,31 +26,56 @@
         <q-btn flat color="primary" title="Run the task" @click="run">Run</q-btn>
       </q-card-actions>
     </q-card>
+
+    <q-dialog v-model="prompt" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">OpenAI API Key</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input dense v-model="openai" placeholder="sk-..." type="password" autofocus @keyup.enter="prompt = false" />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Add" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAssistantStore } from '../stores/assistant';
+import { useCredentialStore } from '../stores/credential';
 
 const router = useRouter();
 const assistantStore = useAssistantStore();
+const credentialStore = useCredentialStore();
 const { name, role, goals, demo } = storeToRefs(assistantStore);
+const { openai } = storeToRefs(credentialStore);
 
-const run = async () => {
+const run = () => {
   router.push('/chat');
 }
+
+const prompt = ref(credentialStore.requireOpenAICredential);
 </script>
 
 <style scoped lang="scss">
+.q-page {
+  padding: 1.25rem
+}
+
 .q-card {
   @media screen and (max-width: 1024px) {
     width: 100%;
   }
 
   width: 50%;
-  padding: 0.5rem;
 
   .q-input {
     margin: 0.5rem;
