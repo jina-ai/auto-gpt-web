@@ -46,13 +46,10 @@ export const useAssistantStore = defineStore('assistant', {
     removeGoal(index: number) {
       this.goals.splice(index, 1);
     },
-    setAssistant(value: Assistant) {
-      this.name = value.name;
-      this.role = value.role;
-      this.goals = value.goals;
-    },
     setDemoAssistant() {
-      this.setAssistant(this.demo);
+      this.name = this.demo.name;
+      this.role = this.demo.role;
+      this.goals = this.demo.goals;
     }
   },
   persist: true,

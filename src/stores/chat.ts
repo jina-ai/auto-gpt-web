@@ -75,7 +75,7 @@ export const useChatStore = defineStore('chat', {
           max_tokens: 1000,
         });
 
-        if (result.data.choices[0].message) {
+        if (result.data.choices[0].message?.['content']) {
           this.addHistoryItem({
             ...result.data.choices[0].message,
             stamp: new Date(),

@@ -11,11 +11,15 @@
         <q-spinner-dots size="2rem" />
       </q-chat-message>
     </div>
+
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn fab :icon="stop ? 'start' : 'stop'" color="accent" @click="stop = !stop" />
+    </q-page-sticky>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar'
@@ -33,19 +37,16 @@ const chatStore = useChatStore();
 // Return to homepage if assistant is not completed
 if (!assistantStore.completed) {
   router.push('/')
-}
-
-// If there is no history, add the basic prompt
-if (!chatStore.hasHistory) {
+} else if (!chatStore.hasHistory) {
   chatStore.addBasicPrompt(assistantStore.prompt);
 }
 
-let a = 3;
+let stop = ref(false);
 onMounted(async () => {
   try {
     const raw = await chatStore.chat();
 
-    while (a > 0) {
+    while (!stop.value) {
       const result = await exec(raw);
 
       await chatStore.chat([{
@@ -55,8 +56,6 @@ onMounted(async () => {
         role: 'user',
         content: 'Determine which next command to use, and respond using the format specified above:',
       }])
-
-      a--;
     }
   } catch (e) {
     if (e instanceof Error) {
