@@ -54,4 +54,5 @@ export const useAssistantStore = defineStore('assistant', {
       this.goals = this.demo.goals;
     }
   },
+  persist: true,
 });

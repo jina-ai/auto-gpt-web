@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
+
+import { useAssistantStore } from './assistant';
 // TODO: allow user add keys on the webpage and save it to local storage
 import { OPENAI_API_KEY } from '../../keys.json';
 
@@ -16,7 +18,8 @@ interface HistoryItem {
   stamp: Date;
 }
 
-interface History {
+interface Chat {
+  thinking: boolean;
   history: HistoryItem[];
 }
 
@@ -25,53 +28,67 @@ const createChatMsg = (role: ChatCompletionRequestMessageRoleEnum, content: stri
 };
 
 export const useChatStore = defineStore('chat', {
-  state: (): History => ({
-    history: [],
-  }),
+  state: (): Chat => {
+    const assistantStore = useAssistantStore();
+
+    return {
+      thinking: false,
+      history: [{
+        id: uuidv4(),
+        role: 'system',
+        content: assistantStore.prompt,
+        stamp: new Date(),
+      }, {
+        id: uuidv4(),
+        role: 'system',
+        content: 'Permanent memory: []',
+        stamp: new Date(),
+      }],
+    }
+  },
   getters: {
+    lastHistoryItem(): HistoryItem | undefined {
+      return this.history[this.history.length - 1];
+    },
+
     hasHistory(): boolean {
       return this.history.length > 0;
+    },
+
+    context(state) {
+      // TODO: calculate tokens and truncate if necessary
+      return state.history.map((item) => {
+        return createChatMsg(item.role, item.content);
+      });
     }
   },
   actions: {
-    async chat({
-      prompt,
-      userInput,
-      permanentMemory
-    }: {
-      prompt: string;
-      userInput: string;
-      permanentMemory: string[];
-    }) {
-      // TODO: calculate tokens
-      const currentContext = [
-        createChatMsg('system', prompt),
-        createChatMsg('system', `Permanent memory: ${permanentMemory.toString()}`)
-      ]
-
-      currentContext.push(createChatMsg('user', userInput));
-
-      currentContext.forEach((msg) => {
-        this.addHistoryItem({
-          ...msg,
-          stamp: new Date(),
-        });
+    async chat(role: ChatCompletionRequestMessageRoleEnum, input: string) {
+      this.addHistoryItem({
+        role,
+        content: input,
+        stamp: new Date(),
       })
 
-      const result = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: currentContext,
-        // TODO:
-        max_tokens: 1000,
-      });
+      this.thinking = true;
+      try {
+        const result = await openai.createChatCompletion({
+          model: 'gpt-3.5-turbo',
+          messages: this.context,
+          // TODO:
+          max_tokens: 1000,
+        });
 
-      if (result.data.choices[0].message) {
-        this.addHistoryItem({
-          ...result.data.choices[0].message,
-          stamp: new Date(),
-        })
+        if (result.data.choices[0].message) {
+          this.addHistoryItem({
+            ...result.data.choices[0].message,
+            stamp: new Date(),
+          })
 
-        return result.data.choices[0].message?.['content'];
+          return result.data.choices[0].message?.['content'];
+        }
+      } finally {
+        this.thinking = false;
       }
     },
 
@@ -85,4 +102,5 @@ export const useChatStore = defineStore('chat', {
       this.history = [];
     },
   },
+  persist: true,
 });

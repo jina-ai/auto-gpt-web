@@ -7,7 +7,7 @@
       </q-chat-message>
 
       <!-- Waiting status -->
-      <q-chat-message v-if="waiting" :name="assistantStore.name" :avatar="roleToAvatarLink['assistant']">
+      <q-chat-message v-if="chatStore.thinking" :name="assistantStore.name" :avatar="roleToAvatarLink['assistant']">
         <q-spinner-dots size="2rem" />
       </q-chat-message>
     </div>
@@ -15,33 +15,40 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 import dayjs from 'dayjs';
 
+import { exec } from '../cmds';
 import { useAssistantStore } from '../stores/assistant';
 import { useChatStore } from '../stores/chat';
-
 import ChatItem from '../components/ChatItem.vue';
 
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
-const { prompt } = storeToRefs(assistantStore);
-
-const waiting = ref(false);
 
 onMounted(async () => {
-  if (chatStore.hasHistory) {
-    return;
-  }
+  switch (chatStore.lastHistoryItem?.role) {
+    case 'assistant':
+      const result = await exec(chatStore.lastHistoryItem?.content);
+      if (result) {
+        await chatStore.chat('system', `Command returned: ${result}`)
+      } else {
+        await chatStore.chat('system', 'Unable to execute command')
+      }
+      break;
+    case 'system':
+    case 'user':
+    default:
+      // TODO: we can have better strategy for recovering chats
+      chatStore.clearHistory();
 
-  waiting.value = true;
-  await chatStore.chat({
-    prompt: prompt.value,
-    userInput: 'Determine which next command to use, and respond using the format specified above:',
-    permanentMemory: [],
-  });
-  waiting.value = false;
+      const raw = await chatStore.chat(
+        'user',
+        'Determine which next command to use, and respond using the format specified above:',
+      );
+
+      await exec(raw);
+  }
 })
 
 const roleToDisplayName = {
