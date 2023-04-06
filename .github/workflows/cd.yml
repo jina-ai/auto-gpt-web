@@ -1,0 +1,37 @@
+name: Deploy
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+on:
+  release:
+    types:
+      - "released"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+      - name: Install and Build
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          cache: yarn
+          cache-dependency-path: 'yarn.lock'
+      - run: yarn install --frozen-lockfile
+      - run: yarn run build
+      - run: |
+          files=(404 share prompts)
+          for file in "${files[@]}"; do
+            cp dist/pwa/index.html dist/pwa/${file}.html
+          done
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.6.2
+        with:
+          ACCESS_TOKEN: ${{ secrets.JINA_DEV_BOT}}
+          BRANCH: gh-pages
+          FOLDER: dist/pwa
+          CLEAN: true
