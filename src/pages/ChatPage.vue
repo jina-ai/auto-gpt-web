@@ -3,8 +3,7 @@
     <div class="container">
       <q-chat-message v-for="{ id, role, content, stamp } in historyStore.list" :key="id" :name="roleToDisplayName[role]"
         :avatar="roleToAvatarLink[role]" :sent="role === 'user'" :stamp="dayjs(stamp).fromNow()" size="8">
-        <!-- TODO: render in a nicer way -->
-        <div>{{ content }}</div>
+        <ChatItem :content="content" />
       </q-chat-message>
 
       <!-- Waiting status -->
@@ -23,6 +22,8 @@ import dayjs from 'dayjs';
 import { chat } from '../ai';
 import { useAssistantStore } from '../stores/assistant';
 import { useHistoryStore } from '../stores/history';
+
+import ChatItem from '../components/ChatItem.vue';
 
 const assistantStore = useAssistantStore();
 const historyStore = useHistoryStore();
