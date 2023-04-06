@@ -34,6 +34,9 @@ export const useAssistantStore = defineStore('assistant', {
       fullPrompt += '\n';
       fullPrompt += prompt;
       return fullPrompt;
+    },
+    completed(state) {
+      return state.name && state.role && state.goals.length >= 1 && state.goals[0];
     }
   },
   actions: {
@@ -49,9 +52,7 @@ export const useAssistantStore = defineStore('assistant', {
       this.goals = value.goals;
     },
     setDemoAssistant() {
-      this.name = this.demo.name;
-      this.role = this.demo.role;
-      this.goals = this.demo.goals;
+      this.setAssistant(this.demo);
     }
   },
   persist: true,

@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useAssistantStore } from './assistant';
 // TODO: allow user add keys on the webpage and save it to local storage
 import { OPENAI_API_KEY } from '../../keys.json';
 
@@ -29,21 +28,9 @@ const createChatMsg = (role: ChatCompletionRequestMessageRoleEnum, content: stri
 
 export const useChatStore = defineStore('chat', {
   state: (): Chat => {
-    const assistantStore = useAssistantStore();
-
     return {
       thinking: false,
-      history: [{
-        id: uuidv4(),
-        role: 'system',
-        content: assistantStore.prompt,
-        stamp: new Date(),
-      }, {
-        id: uuidv4(),
-        role: 'system',
-        content: 'Permanent memory: []',
-        stamp: new Date(),
-      }],
+      history: [],
     }
   },
   getters: {
@@ -63,11 +50,13 @@ export const useChatStore = defineStore('chat', {
     }
   },
   actions: {
-    async chat(role: ChatCompletionRequestMessageRoleEnum, input: string) {
-      this.addHistoryItem({
-        role,
-        content: input,
-        stamp: new Date(),
+    async chat(list?: { role: ChatCompletionRequestMessageRoleEnum, content: string }[]) {
+      list?.forEach(({ role, content }) => {
+        this.addHistoryItem({
+          role,
+          content: content,
+          stamp: new Date(),
+        })
       })
 
       this.thinking = true;
@@ -90,6 +79,25 @@ export const useChatStore = defineStore('chat', {
       } finally {
         this.thinking = false;
       }
+    },
+
+    addBasicPrompt(content: string) {
+      this.history.unshift({
+        id: uuidv4(),
+        role: 'system',
+        content: content,
+        stamp: new Date(),
+      }, {
+        id: uuidv4(),
+        role: 'system',
+        content: 'Permanent memory: []',
+        stamp: new Date(),
+      }, {
+        id: uuidv4(),
+        role: 'user',
+        content: 'Determine which next command to use, and respond using the format specified above:',
+        stamp: new Date(),
+      })
     },
 
     addHistoryItem(item: Omit<HistoryItem, 'id'>) {

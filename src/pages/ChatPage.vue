@@ -17,37 +17,43 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import dayjs from 'dayjs';
+import { useRouter } from 'vue-router';
 
 import { exec } from '../cmds';
 import { useAssistantStore } from '../stores/assistant';
 import { useChatStore } from '../stores/chat';
 import ChatItem from '../components/ChatItem.vue';
 
+const router = useRouter();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 
+// Return to homepage if assistant is not completed
+if (!assistantStore.completed) {
+  router.push('/')
+}
+
+// If there is no history, add the basic prompt
+if (!chatStore.hasHistory) {
+  chatStore.addBasicPrompt(assistantStore.prompt);
+}
+
+let a = 3;
 onMounted(async () => {
-  switch (chatStore.lastHistoryItem?.role) {
-    case 'assistant':
-      const result = await exec(chatStore.lastHistoryItem?.content);
-      if (result) {
-        await chatStore.chat('system', `Command returned: ${result}`)
-      } else {
-        await chatStore.chat('system', 'Unable to execute command')
-      }
-      break;
-    case 'system':
-    case 'user':
-    default:
-      // TODO: we can have better strategy for recovering chats
-      chatStore.clearHistory();
+  const raw = await chatStore.chat();
 
-      const raw = await chatStore.chat(
-        'user',
-        'Determine which next command to use, and respond using the format specified above:',
-      );
+  while (a > 0) {
+    const result = await exec(raw);
 
-      await exec(raw);
+    await chatStore.chat([{
+      role: 'system',
+      content: result ? `Command returned: ${result}` : 'Unable to execute command',
+    }, {
+      role: 'user',
+      content: 'Determine which next command to use, and respond using the format specified above:',
+    }])
+
+    a--;
   }
 })
 
