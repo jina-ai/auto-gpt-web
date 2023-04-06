@@ -58,5 +58,5 @@ RESPONSE FORMAT:
     }
 }
 
-Ensure the response can be parsed by Python json.loads
+Ensure the response can be parsed by Javascript JSON.parse() function.
 `

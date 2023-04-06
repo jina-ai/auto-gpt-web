@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { prompt } from '../prompt';
 
 export interface Assistant {
   name: string;
@@ -23,6 +24,16 @@ export const useAssistantStore = defineStore('assistant', {
           'Shutdown upon achieving the goal.'
         ]
       };
+    },
+    prompt(state) {
+      let fullPrompt = `You are ${state.name}, ${state.role}\nYour decisions must always be made independently without seeking user assistance. Play to your strengths as an LLM and pursue simple strategies with no legal complications.\n\nGOALS:\n\n`
+      this.goals.forEach((goal, index) => {
+        fullPrompt += `${index + 1}. ${goal}\n`
+      })
+
+      fullPrompt += '\n';
+      fullPrompt += prompt;
+      return fullPrompt;
     }
   },
   actions: {

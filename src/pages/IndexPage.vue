@@ -26,12 +26,14 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useAssistantStore } from '../stores/assistant';
 
+const router = useRouter();
 const assistantStore = useAssistantStore();
 const { name, role, goals, demo } = storeToRefs(assistantStore);
 
-const run = () => {
+const run = async () => {
   // Save assistant configuration
   assistantStore.setAssistant({
     name: name.value,
@@ -39,16 +41,11 @@ const run = () => {
     goals: goals.value
   });
 
-  // TODO: implement
+  router.push('/chat');
 }
 </script>
 
 <style scoped lang="scss">
-.q-page {
-  padding: 20px;
-  background: rgb(255, 186, 0);
-  background: linear-gradient(135deg, rgba(255, 186, 0, 1) 0%, rgba(16, 168, 168, 1) 46%, rgba(198, 24, 175, 1) 100%);
-}
 
 .q-card {
   @media screen and (max-width: 1024px) {
