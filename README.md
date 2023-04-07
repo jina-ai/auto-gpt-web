@@ -4,7 +4,7 @@
 
 Inspired by [Auto-GPT](https://github.com/Torantulino/Auto-GPT).
 
-![Demo screenshot](.github/static/demo.png)
+![Demo screenshot](.github/static/demo.gif)
 
 ## Features
 
