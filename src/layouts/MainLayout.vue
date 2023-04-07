@@ -12,6 +12,6 @@
 <style scoped lang="scss">
 .q-page-container {
   background: rgb(251, 203, 103);
-  background: linear-gradient(135deg, rgba(251, 203, 103, 1) 0%, rgba(0, 145, 145, 1) 50%, rgba(235, 97, 97, 1) 100%);
+  background: linear-gradient(135deg, rgba(251, 203, 103, 0.7) 0%, rgba(0, 145, 145, 0.7) 50%, rgba(235, 97, 97, 0.7) 100%);
 }
 </style>

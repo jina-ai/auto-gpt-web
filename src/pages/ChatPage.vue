@@ -13,7 +13,7 @@
     </div>
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab :icon="stop ? 'start' : 'stop'" color="accent" @click="stop = !stop" />
+      <q-btn fab :icon="stop ? 'start' : 'stop'" @click="stop = !stop" />
     </q-page-sticky>
   </q-page>
 </template>
