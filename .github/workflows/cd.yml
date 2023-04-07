@@ -45,7 +45,7 @@ jobs:
           for file in "${files[@]}"; do
             cp dist/pwa/index.html dist/pwa/${file}.html
           done
-          cat 'autogpt.jina.ai' > dist/pwa/CNAME
+          echo 'autogpt.jina.ai' > dist/pwa/CNAME
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
