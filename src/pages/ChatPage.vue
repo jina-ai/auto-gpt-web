@@ -144,6 +144,7 @@ const resetChatHistory = () => {
 }
 const resetAssistant = () => {
   fabRight.value = false;
+  chatStore.$reset();
   assistantStore.$reset();
   location.reload();
 }
