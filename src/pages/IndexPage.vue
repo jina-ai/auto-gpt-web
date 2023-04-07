@@ -34,7 +34,16 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input dense v-model="openai" placeholder="sk-..." type="password" autofocus @keyup.enter="prompt = false" />
+          <q-input dense v-model="openai" placeholder="sk-..." type="password" autofocus />
+        </q-card-section>
+
+        <q-card-section>
+          <div class="text-h6">Google Authentication</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input dense v-model="google.key" type="password" />
+          <q-input dense v-model="google.engine" type="password" />
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
@@ -56,7 +65,7 @@ const router = useRouter();
 const assistantStore = useAssistantStore();
 const credentialStore = useCredentialStore();
 const { name, role, goals, demo } = storeToRefs(assistantStore);
-const { openai } = storeToRefs(credentialStore);
+const { openai, google } = storeToRefs(credentialStore);
 
 const run = () => {
   router.push('/chat');

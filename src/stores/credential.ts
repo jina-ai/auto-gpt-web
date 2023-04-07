@@ -2,11 +2,19 @@ import { defineStore } from 'pinia';
 
 export interface Credentials {
   openai: string;
+  google: {
+    key: string;
+    engine: string;
+  }
 }
 
 export const useCredentialStore = defineStore('credential', {
   state: (): Credentials => ({
-    openai: ''
+    openai: '',
+    google: {
+      key: '',
+      engine: '',
+    }
   }),
   getters: {
     requireOpenAICredential(): boolean {
@@ -14,12 +22,6 @@ export const useCredentialStore = defineStore('credential', {
     }
   },
   actions: {
-    setOpenAI(key: string) {
-      this.openai = key;
-    },
-    clear() {
-      this.openai = '';
-    }
   },
   persist: true,
 });

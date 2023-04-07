@@ -6,5 +6,5 @@
   "editor.codeActionsOnSave": ["source.fixAll.eslint"],
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["cmds", "uuidv"]
+  "cSpell.words": ["cmds", "serp", "serpapi", "uuidv"]
 }

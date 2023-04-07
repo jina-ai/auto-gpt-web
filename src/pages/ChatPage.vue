@@ -54,7 +54,7 @@ onMounted(async () => {
         content: result ? `Command returned: ${result}` : 'Unable to execute command',
       }, {
         role: 'user',
-        content: 'Determine which next command to use, and respond using the format specified above:',
+        content: 'GENERATE NEXT COMMAND JSON',
       }])
     }
   } catch (e) {

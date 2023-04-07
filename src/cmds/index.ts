@@ -1,5 +1,7 @@
 import * as cmd from '.';
 
+export * from './google';
+
 export const exec = async (raw = '{}') => {
   const { name, args } = JSON.parse(raw).command as {
     name: keyof typeof cmd;
@@ -15,9 +17,4 @@ export const exec = async (raw = '{}') => {
   if (typeof cmd[name] === 'function') {
     return cmd[name](args.input);
   }
-}
-
-export const google = async (input: string) => {
-  // TODO: implement
-  return input;
 }
