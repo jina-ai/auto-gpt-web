@@ -1,20 +1,32 @@
-# Auto-GPT-web: An Website allows GPT-4 to run autonomously 🤖
+# AutoGPT Website
 
-Run GPT-4 autonomously on the web. Inspired by [Auto-GPT](https://github.com/Torantulino/Auto-GPT).
+**Set Your Goals, AI Achieves Them.** You can set up the initial role and goals for your AI buddy, without human's supervision, it will automatically leverage all of the resources it has to achieve your goal.
 
-> Auto-GPT is an experimental open-source application showcasing the capabilities of the GPT-4 language model. This program, driven by GPT-4, autonomously develops and manages businesses to increase net worth. As one of the first examples of GPT-4 running fully autonomously, Auto-GPT pushes the boundaries of what is possible with AI.
-
-PLACEHOLDER: website url
+Inspired by [Auto-GPT](https://github.com/Torantulino/Auto-GPT).
 
 ![Demo screenshot](.github/static/demo.png)
 
 ## Features
+
+- 🌐 Internet access for searches and information gathering
+- 💾 Save your definition of AI, chat history and credentials in the browser
+- [ ] Long-Term and Short-Term memory management
+- [ ] File storage and summarization with GPT-3.5
+- [ ] GPT-4 instances for text generation
 
 ## Requirements
 
 Required:
 
 - OpenAI API Key
+- Google
+  - Search API Key
+  - Custom Search Engine ID
+
+## Security
+
+- All of your credentials will be saved in your local browser **ONLY** and be sent to the providers (OpenAI, Google Search API...) when necessary. You can remove them completely anytime.
+- All of your chat history will be saved in your local browser **ONLY**. You can remove them completely anytime.
 
 ## Development
 
