@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column items-center justify-evenly">
+  <q-page class="column items-center justify-evenly" padding>
     <header class="header">
       <div class="title">Accomplish Task Autonomously</div>
       <div class="description">Your AI assistant will recursively use tools (e.g. search...) to achieve your goals as much
@@ -75,10 +75,6 @@ const prompt = ref(credentialStore.requireOpenAICredential);
 </script>
 
 <style scoped lang="scss">
-.q-page {
-  padding: 1.25rem
-}
-
 .q-card {
   @media screen and (max-width: 1024px) {
     width: 100%;

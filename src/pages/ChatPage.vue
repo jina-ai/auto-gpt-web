@@ -1,6 +1,6 @@
 <template>
-  <q-page class="column items-center justify-evenly">
-    <div class="container">
+  <q-page class="column items-center justify-evenly" padding>
+    <div class="container" ref="containerRef">
       <q-chat-message v-for="{ id, role, content, stamp } in chatStore.history" :key="id" :name="roleToDisplayName[role]"
         :avatar="roleToAvatarLink[role]" :sent="role === 'user'" :stamp="dayjs(stamp).fromNow()" size="8">
         <ChatItem :content="content" />
@@ -24,15 +24,19 @@
         </div>
       </q-chat-message>
     </div>
+
+    <q-page-scroller position="bottom-right" :scroll-offset="100" :offset="[18, 18]">
+      <q-btn fab icon="keyboard_arrow_up" color="secondary" />
+    </q-page-scroller>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
-import { useQuasar } from 'quasar'
+import { useQuasar, scroll } from 'quasar'
 
 import { useAssistantStore } from '../stores/assistant';
 import { useChatStore } from '../stores/chat';
@@ -43,6 +47,18 @@ const router = useRouter();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const { lastHistoryItem, deciding, thinking, executing } = storeToRefs(chatStore);
+
+const roleToDisplayName = {
+  user: 'ME',
+  system: 'SYSTEM',
+  assistant: assistantStore.name,
+}
+
+const roleToAvatarLink = {
+  user: 'https://cdn.quasar.dev/img/avatar1.jpg',
+  system: 'https://cdn.quasar.dev/img/avatar2.jpg',
+  assistant: 'https://cdn.quasar.dev/img/avatar3.jpg',
+}
 
 // Return to homepage if assistant is not completed
 if (!assistantStore.completed) {
@@ -77,6 +93,8 @@ const moveOn = async () => {
 }
 
 onMounted(async () => {
+  scrollToBottom();
+
   try {
     if (lastHistoryItem.value?.role && ['user', 'system'].includes(lastHistoryItem.value?.role)) {
       await chatStore.chat();
@@ -97,24 +115,24 @@ onMounted(async () => {
   }
 })
 
-const roleToDisplayName = {
-  user: 'ME',
-  system: 'SYSTEM',
-  assistant: assistantStore.name,
+const containerRef = ref<HTMLDivElement | null>(null);
+const scrollToBottom = () => {
+  if (containerRef.value) {
+    const target = scroll.getScrollTarget(containerRef.value);
+    const offset = containerRef.value.scrollHeight;
+    const duration = 1000;
+    scroll.animVerticalScrollTo(target, offset, duration);
+  }
 }
 
-const roleToAvatarLink = {
-  user: 'https://cdn.quasar.dev/img/avatar1.jpg',
-  system: 'https://cdn.quasar.dev/img/avatar2.jpg',
-  assistant: 'https://cdn.quasar.dev/img/avatar3.jpg',
-}
+watch(chatStore, () => {
+  scrollToBottom();
+}, {
+  deep: true
+});
 </script>
 
 <style scoped lang="scss">
-.q-page {
-  padding: 1.25rem
-}
-
 .container {
   @media screen and (max-width: 1024px) {
     width: 100%;
