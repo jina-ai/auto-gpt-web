@@ -30,20 +30,12 @@
     <q-dialog v-model="prompt" persistent>
       <q-card style="min-width: 350px">
         <q-card-section>
-          <div class="text-h6">OpenAI API Key</div>
+          <div class="text-h6">Please provide credentials</div>
         </q-card-section>
-
         <q-card-section class="q-pt-none">
-          <q-input dense v-model="openai" placeholder="sk-..." type="password" autofocus />
-        </q-card-section>
-
-        <q-card-section>
-          <div class="text-h6">Google Authentication</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <q-input dense v-model="google.key" type="password" />
-          <q-input dense v-model="google.engine" type="password" />
+          <q-input dense v-model="openai" label="OpenAI API Key" placeholder="sk-..." type="password" />
+          <q-input dense v-model="google.key" label="Google API Key" type="password" />
+          <q-input dense v-model="google.engine" label="Google custom search engine id" type="password" />
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">

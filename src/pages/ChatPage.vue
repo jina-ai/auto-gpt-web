@@ -31,6 +31,8 @@
           label="Reset chat history" />
         <q-fab-action label-position="left" color="red" @click="resetAssistant()" icon="smart_toy"
           label="Reset assistant" />
+        <q-fab-action label-position="left" color="red" @click="resetCredentials()" icon="key"
+          label="Reset credentials" />
       </q-fab>
     </q-page-sticky>
   </q-page>
@@ -46,11 +48,13 @@ import { useQuasar, scroll } from 'quasar'
 import { useAssistantStore } from '../stores/assistant';
 import { useChatStore } from '../stores/chat';
 import ChatItem from '../components/ChatItem.vue';
+import { useCredentialStore } from '../stores/credential';
 
 const $q = useQuasar()
 const router = useRouter();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
+const credentialStore = useCredentialStore();
 const { lastHistoryItem, deciding, thinking, executing } = storeToRefs(chatStore);
 
 const roleToDisplayName = {
@@ -146,6 +150,13 @@ const resetAssistant = () => {
   fabRight.value = false;
   chatStore.$reset();
   assistantStore.$reset();
+  location.reload();
+}
+const resetCredentials = () => {
+  fabRight.value = false;
+  chatStore.$reset();
+  assistantStore.$reset();
+  credentialStore.$reset();
   location.reload();
 }
 </script>
