@@ -25,9 +25,14 @@
       </q-chat-message>
     </div>
 
-    <q-page-scroller position="bottom-right" :scroll-offset="100" :offset="[18, 18]">
-      <q-btn fab icon="keyboard_arrow_up" color="secondary" />
-    </q-page-scroller>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-fab v-model="fabRight" vertical-actions-align="right" color="primary" icon="keyboard_arrow_up" direction="up">
+        <q-fab-action label-position="left" color="red" @click="resetChatHistory()" icon="restart_alt"
+          label="Reset chat history" />
+        <q-fab-action label-position="left" color="red" @click="resetAssistant()" icon="smart_toy"
+          label="Reset assistant" />
+      </q-fab>
+    </q-page-sticky>
   </q-page>
 </template>
 
@@ -130,6 +135,18 @@ watch(chatStore, () => {
 }, {
   deep: true
 });
+
+const fabRight = ref(false);
+const resetChatHistory = () => {
+  fabRight.value = false;
+  chatStore.$reset();
+  location.reload();
+}
+const resetAssistant = () => {
+  fabRight.value = false;
+  assistantStore.$reset();
+  location.reload();
+}
 </script>
 
 <style scoped lang="scss">
