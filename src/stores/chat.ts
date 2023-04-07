@@ -3,6 +3,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } from '
 import { v4 as uuidv4 } from 'uuid';
 
 import { useCredentialStore } from './credential';
+import { exec, Command } from '../cmds';
 
 interface HistoryItem {
   id: string;
@@ -13,7 +14,19 @@ interface HistoryItem {
 
 interface Chat {
   openai?: OpenAIApi;
+  /**
+   * If the OpenAI is thinking
+   */
   thinking: boolean;
+  /**
+   * If the human is deciding whether to continue
+   */
+  deciding: boolean;
+  /**
+   * If the command is being executed
+   */
+  executing: boolean;
+  currentCommandJson: string;
   history: HistoryItem[];
 }
 
@@ -25,6 +38,9 @@ export const useChatStore = defineStore('chat', {
   state: (): Chat => {
     return {
       thinking: false,
+      deciding: false,
+      executing: false,
+      currentCommandJson: '',
       history: [],
     }
   },
@@ -42,6 +58,14 @@ export const useChatStore = defineStore('chat', {
       return state.history.map((item) => {
         return createChatMsg(item.role, item.content);
       });
+    },
+
+    currentCommand(state) {
+      if (state.currentCommandJson) {
+        return JSON.parse(state.currentCommandJson).command as Command;
+      }
+
+      return null;
     }
   },
   actions: {
@@ -81,10 +105,31 @@ export const useChatStore = defineStore('chat', {
             stamp: new Date(),
           })
 
-          return result.data.choices[0].message?.['content'];
+          this.currentCommandJson = result.data.choices[0].message?.['content'];
         }
       } finally {
+        // It's time for the user to decide once AI gives response
+        this.deciding = true;
         this.thinking = false;
+      }
+    },
+
+    async exec() {
+      this.executing = true;
+
+      if (!this.currentCommand) {
+        return;
+      }
+
+      try {
+        const result = await exec(this.currentCommand);
+        this.addHistoryItem({
+          role: 'system',
+          content: result ? `Command returned: ${result}` : 'Unable to execute command',
+          stamp: new Date(),
+        });
+      } finally {
+        this.executing = false;
       }
     },
 

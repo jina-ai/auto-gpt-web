@@ -6,25 +6,34 @@
         <ChatItem :content="content" />
       </q-chat-message>
 
-      <!-- Waiting status -->
-      <q-chat-message v-if="chatStore.thinking" :name="assistantStore.name" :avatar="roleToAvatarLink['assistant']">
+      <!-- Waiting for AI -->
+      <q-chat-message v-if="thinking" :name="roleToDisplayName['assistant']" :avatar="roleToAvatarLink['assistant']">
         <q-spinner-dots size="2rem" />
       </q-chat-message>
-    </div>
 
-    <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab :icon="stop ? 'start' : 'stop'" @click="stop = !stop" />
-    </q-page-sticky>
+      <!-- Waiting for system -->
+      <q-chat-message v-if="executing" :name="roleToDisplayName['system']" :avatar="roleToAvatarLink['system']">
+        <q-spinner-gears size="2rem" />
+      </q-chat-message>
+
+      <!-- Waiting for user's decision -->
+      <q-chat-message v-if="deciding" :name="roleToDisplayName['user']" :avatar="roleToAvatarLink['user']" sent size="4">
+        <div>
+          <q-spinner-rings size="2rem" />
+          <q-btn flat @click="moveOn()">move on!</q-btn>
+        </div>
+      </q-chat-message>
+    </div>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar'
 
-import { exec } from '../cmds';
 import { useAssistantStore } from '../stores/assistant';
 import { useChatStore } from '../stores/chat';
 import ChatItem from '../components/ChatItem.vue';
@@ -33,6 +42,7 @@ const $q = useQuasar()
 const router = useRouter();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
+const { lastHistoryItem, deciding, thinking, executing } = storeToRefs(chatStore);
 
 // Return to homepage if assistant is not completed
 if (!assistantStore.completed) {
@@ -41,21 +51,35 @@ if (!assistantStore.completed) {
   chatStore.addBasicPrompt(assistantStore.prompt);
 }
 
-let stop = ref(false);
+const moveOn = async () => {
+  deciding.value = false;
+
+  try {
+    await chatStore.exec();
+    await chatStore.chat([{
+      role: 'user',
+      content: 'Generate next command json',
+    }])
+  } catch (e) {
+    if (e instanceof Error) {
+      $q.notify({
+        type: 'negative',
+        message: e.message,
+      });
+      return;
+    }
+
+    $q.notify({
+      type: 'negative',
+      message: `Unknown error: ${e}`,
+    });
+  }
+}
+
 onMounted(async () => {
   try {
-    const raw = await chatStore.chat();
-
-    while (!stop.value) {
-      const result = await exec(raw);
-
-      await chatStore.chat([{
-        role: 'system',
-        content: result ? `Command returned: ${result}` : 'Unable to execute command',
-      }, {
-        role: 'user',
-        content: 'GENERATE NEXT COMMAND JSON',
-      }])
+    if (lastHistoryItem.value?.role && ['user', 'system'].includes(lastHistoryItem.value?.role)) {
+      await chatStore.chat();
     }
   } catch (e) {
     if (e instanceof Error) {
@@ -74,8 +98,8 @@ onMounted(async () => {
 })
 
 const roleToDisplayName = {
-  user: 'me',
-  system: 'system',
+  user: 'ME',
+  system: 'SYSTEM',
   assistant: assistantStore.name,
 }
 
