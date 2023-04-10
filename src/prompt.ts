@@ -6,10 +6,10 @@ export const prompt = `CONSTRAINTS:
 COMMANDS:
 
 1. Google Search: "google", args: "input": "<search>"
-2. Memory Add: "memory_add", args: "string": "<string>"
-3. Memory Delete: "memory_del", args: "key": "<key>"
-4. Memory Overwrite: "memory_ovr", args: "key": "<key>", "string": "<string>"
-5. Browse Website: "browse_website", args: "url": "<url>"
+2. Browse Website: "browse", args: "url": "<url>"
+3. Memory Add: "memory_add", args: "string": "<string>"
+4. Memory Delete: "memory_del", args: "key": "<key>"
+5. Memory Overwrite: "memory_ovr", args: "key": "<key>", "string": "<string>"
 6. Start GPT Agent: "start_agent",  args: "name": "<name>", "task": "<short_task_desc>", "prompt": "<prompt>"
 7. Message GPT Agent: "message_agent", args: "key": "<key>", "message": "<message>"
 8. List GPT Agents: "list_agents", args: ""

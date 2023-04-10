@@ -1,6 +1,7 @@
 import * as cmd from '.';
 
 export * from './google';
+export * from './browse-website';
 
 export interface Command {
   name: keyof typeof cmd;
@@ -14,7 +15,16 @@ export const exec = async ({ name, args }: Command) => {
     return;
   }
 
-  if (typeof cmd[name] === 'function') {
-    return cmd[name](args.input);
+  if (typeof cmd[name] !== 'function') {
+    throw new Error(`Command ${name} not found`);
+  }
+
+  switch (name) {
+    case 'google':
+      return cmd[name](args.input);
+    case 'browse':
+      return cmd[name](args.url);
+    default:
+      throw new Error(`Command ${name} not implemented`);
   }
 }
