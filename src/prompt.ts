@@ -6,7 +6,7 @@ export const prompt = `CONSTRAINTS:
 COMMANDS:
 
 1. Google Search: "google", args: "input": "<search>"
-2. Browse Website: "browse", args: "url": "<url>"
+2. Browse Website: "browse", args: "url": "<url>", "question": "<what_you_want_to_find_on_website>"
 3. Memory Add: "memory_add", args: "string": "<string>"
 4. Memory Delete: "memory_del", args: "key": "<key>"
 5. Memory Overwrite: "memory_ovr", args: "key": "<key>", "string": "<string>"
@@ -60,23 +60,11 @@ RESPONSE FORMAT:
 Ensure the response can be parsed by Javascript JSON.parse() function.
 `
 
-export const getWebsiteSummary = (content: string, goal?: string) => {
-  let result = '';
-
-  if (goal) {
-    result += `GOAL: ${goal}`;
-  }
-
-  result += `
-Summarize the website text with following constraints:
-1. Do not describe the general website
-2. But instead concisely extract the specific information this page contains
-3. Especially keep the information that can achieve the goal
-
-WEBSITE CONTENT:
-
+export const getWebsiteSummary = (content: string, question?: string) => {
+  return `"""
 ${content}
-`;
+"""
 
-  return result;
+Using the above text, please answer the following question: "${question}" -- if the question cannot be answered using the text, please summarize the text.
+`;
 }

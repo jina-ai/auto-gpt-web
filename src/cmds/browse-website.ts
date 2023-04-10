@@ -59,7 +59,7 @@ const splitText = (text: string, maxLength = 8192) => {
   return result;
 }
 
-const summaryText = async (text: string) => {
+const summaryText = async (text: string, question: string) => {
   const chatStore = useChatStore();
 
   text = text.trim();
@@ -77,7 +77,7 @@ const summaryText = async (text: string) => {
       messages: [
         {
           'role': 'user',
-          'content': getWebsiteSummary(chunk, chatStore.currentThought?.reasoning)
+          'content': getWebsiteSummary(chunk, question)
         },
       ],
       max_tokens: 300,
@@ -95,7 +95,7 @@ const summaryText = async (text: string) => {
     messages: [
       {
         'role': 'user',
-        'content': getWebsiteSummary(summaries.join('\n'), chatStore.currentThought?.reasoning)
+        'content': getWebsiteSummary(summaries.join('\n'), question)
       },
     ],
     max_tokens: 300,
@@ -108,11 +108,11 @@ const summaryText = async (text: string) => {
  * Browse specific website and return the summary content
  * @param url website url
  */
-export const browse = async (url: string) => {
+export const browse = async (url: string, question: string) => {
   const html = await fetchContent(url);
   const text = extractText(html);
 
-  const summary = await summaryText(text);
+  const summary = await summaryText(text, question);
   const links = extractLinks(text);
 
   let result = `Website Content Summary:\n${summary}`;
