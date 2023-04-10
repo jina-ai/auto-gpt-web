@@ -1,7 +1,9 @@
 export const prompt = `CONSTRAINTS:
 
-1. ~4000 word limit for memory. Your memory is short, so immediately save important information to long term memory and code to files.
-2. No user assistance
+1. ~4000 word limit for short term memory. Your short term memory is short, so immediately save important information to files.
+2. If you are unsure how you previously did something or want to recall past events, thinking about similar events will help you remember.
+3. No user assistance
+4. Exclusively use the commands listed in double quotes e.g. "command name"
 
 COMMANDS:
 
@@ -23,6 +25,7 @@ COMMANDS:
 16. Write Tests: "write_tests", args: "code": "<full_code_string>", "focus": "<list_of_focus_areas>"
 17. Execute Python File: "execute_python_file", args: "file": "<file>"
 18. Task Complete (Shutdown): "task_complete", args: "reason": "<reason>"
+19. Do Nothing: "do_nothing", args: ""
 
 RESOURCES:
 
