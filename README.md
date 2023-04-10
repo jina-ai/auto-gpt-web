@@ -10,9 +10,9 @@ Inspired by [Auto-GPT](https://github.com/Torantulino/Auto-GPT).
 
 - 🌐 Internet access for searches and information gathering
 - 💾 Save your definition of AI, chat history and credentials in the browser
-- [ ] Long-Term and Short-Term memory management
-- [ ] File storage and summarization with GPT-3.5
-- [ ] GPT-4 instances for text generation
+- [ ] Long-Term memory (based on browser-based vector database)
+- [ ] Electron Application
+- [ ] Using Electron webview to conduct search operations (remove google search api limitation and solve SPA problem)
 
 ## Requirements
 
