@@ -16,8 +16,8 @@ export const useAssistantStore = defineStore('assistant', {
   getters: {
     demo() {
       return {
-        name: 'Entrepreneur-GPT',
-        role: 'an AI designed to autonomously develop and run business with the sole goal of increasing your net worth.',
+        name: 'ChefGPT',
+        role: 'an AI designed to browse the web to discover the next upcoming event and invent a unique and original recipe that would suit it.',
         goals: [
           'Invent an original and out-of-the-box recipe to suit a current event, such as Easter.',
           'Save the resulting recipe to a file.',

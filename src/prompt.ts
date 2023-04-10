@@ -42,20 +42,41 @@ You should only respond in JSON format as described below
 
 RESPONSE FORMAT:
 {
-  "command": {
-    "name": "command name",
-    "args":{
-      "key": "value"
+    "command": {
+        "name": "command name",
+        "args":{
+            "key": "value"
+        }
+    },
+    "thoughts": {
+        "text": "thought",
+        "reasoning": "reasoning",
+        "plan": [short bulleted,list that conveys,long-term plan],
+        "criticism": "constructive self-criticism",
+        "speak": "thoughts summary to say to user"
     }
-  },
-  "thoughts": {
-    "text": "thought",
-    "reasoning": "reasoning",
-    "plan": [short bulleted,list that conveys,long-term plan],
-    "criticism": "constructive self-criticism",
-    "speak": "thoughts summary to say to user"
-  }
 }
 
 Ensure the response can be parsed by Javascript JSON.parse() function.
 `
+
+export const getWebsiteSummary = (content: string, goal?: string) => {
+  let result = '';
+
+  if (goal) {
+    result += `GOAL: ${goal}`;
+  }
+
+  result += `
+Summarize the website text with following constraints:
+1. Do not describe the general website
+2. But instead concisely extract the specific information this page contains
+3. Especially keep the information that can achieve the goal
+
+WEBSITE CONTENT:
+
+${content}
+`;
+
+  return result;
+}

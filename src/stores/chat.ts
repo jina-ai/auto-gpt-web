@@ -5,6 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { useCredentialStore } from './credential';
 import { exec, Command } from '../cmds';
 
+interface Thought {
+  text: string;
+  reasoning: string;
+  plan: string[];
+  criticism: string;
+  speak: string;
+}
+
 interface HistoryItem {
   id: string;
   role: ChatCompletionRequestMessageRoleEnum;
@@ -79,6 +87,14 @@ export const useChatStore = defineStore('chat', {
     currentCommand(state) {
       if (state.currentCommandJson) {
         return JSON.parse(state.currentCommandJson).command as Command;
+      }
+
+      return null;
+    },
+
+    currentThought(state) {
+      if (state.currentCommandJson) {
+        return JSON.parse(state.currentCommandJson).thoughts as Thought;
       }
 
       return null;

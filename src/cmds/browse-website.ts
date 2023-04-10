@@ -1,3 +1,4 @@
+import { getWebsiteSummary } from '../prompt';
 import { useChatStore } from '../stores/chat';
 
 const PROXY = 'https://young-stream-68812.herokuapp.com'
@@ -23,7 +24,6 @@ const extractText = (html: string) => {
 }
 
 const extractLinks = (html: string) => {
-  debugger
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
@@ -40,7 +40,8 @@ const splitText = (text: string, maxLength = 8192) => {
   let currentChunk: string[] = [];
   const result: string[] = [];
 
-  for (const paragraph of paragraphs) {
+  for (let paragraph of paragraphs) {
+    paragraph = paragraph.trim();
     if (currentLength + paragraph.length + 1 <= maxLength) {
       currentChunk.push(paragraph);
       currentLength += paragraph.length + 1;
@@ -68,7 +69,7 @@ const summaryText = async (text: string) => {
 
   const chunks = splitText(text);
 
-  const index = 0;
+  let index = 0;
   const summaries = [];
   for (const chunk of chunks) {
     const result = await chatStore.openai.createChatCompletion({
@@ -76,8 +77,7 @@ const summaryText = async (text: string) => {
       messages: [
         {
           'role': 'user',
-          'content': 'Please summarize the following website text, do not describe the general website, but instead concisely extract the specific information this page contains: \n' +
-            chunk
+          'content': getWebsiteSummary(chunk, chatStore.currentThought?.reasoning)
         },
       ],
       max_tokens: 300,
@@ -85,6 +85,7 @@ const summaryText = async (text: string) => {
 
     const summary = result.data.choices[0].message?.['content'];
     console.log(`Summary of chunk ${index}: ${summary}`)
+    index++;
 
     summaries.push(summary);
   }
@@ -94,8 +95,7 @@ const summaryText = async (text: string) => {
     messages: [
       {
         'role': 'user',
-        'content': 'Please summarize the following website text, do not describe the general website, but instead concisely extract the specific information this page contains: \n' +
-          summaries.join('\n')
+        'content': getWebsiteSummary(summaries.join('\n'), chatStore.currentThought?.reasoning)
       },
     ],
     max_tokens: 300,
