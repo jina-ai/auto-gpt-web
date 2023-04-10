@@ -1,3 +1,3 @@
-export const shutdown = () => {
-  return 'Shutting down';
+export const shutdown = (reason: string) => {
+  return `Shutting down because: ${reason}`;
 }

@@ -9,12 +9,8 @@ COMMANDS:
 
 1. Google Search: "google", args: "input": "<search>"
 2. Browse Website: "browse", args: "url": "<url>", "question": "<what_you_want_to_find_on_website>"
-3. Start GPT Agent: "start_agent",  args: "name": "<name>", "task": "<short_task_desc>", "prompt": "<prompt>"
-4. Message GPT Agent: "message_agent", args: "key": "<key>", "message": "<message>"
-5. List GPT Agents: "list_agents", args: ""
-6. Delete GPT Agent: "delete_agent", args: "key": "<key>"
-7. Task Complete (Shutdown): "shutdown", args: "reason": "<reason>"
-8. Do Nothing: "doNothing", args: ""
+3. Task Complete (Shutdown): "shutdown", args: "reason": "<reason>"
+4. Do Nothing: "doNothing", args: ""
 
 RESOURCES:
 

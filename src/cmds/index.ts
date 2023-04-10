@@ -2,6 +2,8 @@ import * as cmd from '.';
 
 export * from './google';
 export * from './browse-website';
+export * from './shutdown';
+export * from './do-nothing';
 
 export interface Command {
   name: keyof typeof cmd;
@@ -23,7 +25,11 @@ export const exec = async ({ name, args }: Command) => {
     case 'google':
       return cmd[name](args.input);
     case 'browse':
-      return cmd[name](args.url);
+      return cmd[name](args.url, args.question);
+    case 'doNothing':
+      return cmd[name]();
+    case 'shutdown':
+      return cmd[name](args.reason);
     default:
       throw new Error(`Command ${name} not implemented`);
   }
