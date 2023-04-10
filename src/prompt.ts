@@ -42,19 +42,19 @@ You should only respond in JSON format as described below
 
 RESPONSE FORMAT:
 {
-    "command": {
-        "name": "command name",
-        "args":{
-            "arg name": "value"
-        }
-    },
-    "thoughts": {
-        "text": "thought",
-        "reasoning": "reasoning",
-        "plan": [short bulleted,list that conveys,long-term plan],
-        "criticism": "constructive self-criticism",
-        "speak": "thoughts summary to say to user"
+  "command": {
+    "name": "command name",
+    "args":{
+      "key": "value"
     }
+  },
+  "thoughts": {
+    "text": "thought",
+    "reasoning": "reasoning",
+    "plan": [short bulleted,list that conveys,long-term plan],
+    "criticism": "constructive self-criticism",
+    "speak": "thoughts summary to say to user"
+  }
 }
 
 Ensure the response can be parsed by Javascript JSON.parse() function.

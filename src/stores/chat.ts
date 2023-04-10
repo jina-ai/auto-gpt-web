@@ -34,30 +34,6 @@ const createChatMsg = (role: ChatCompletionRequestMessageRoleEnum, content: stri
   return { role, content }
 };
 
-const splitText = (text: string, maxLength = 8192) => {
-  const paragraphs = text.split('\n');
-  let currentLength = 0;
-  let currentChunk: string[] = [];
-  const result: string[] = [];
-
-  for (const paragraph of paragraphs) {
-    if (currentLength + paragraph.length + 1 <= maxLength) {
-      currentChunk.push(paragraph);
-      currentLength += paragraph.length + 1;
-    } else {
-      result.push(currentChunk.join('\n'));
-      currentChunk = [paragraph];
-      currentLength = paragraph.length + 1;
-    }
-  }
-
-  if (currentChunk.length > 0) {
-    result.push(currentChunk.join('\n'));
-  }
-
-  return result;
-}
-
 export const useChatStore = defineStore('chat', {
   state: (): Chat => {
     return {
@@ -153,63 +129,12 @@ export const useChatStore = defineStore('chat', {
         const result = await exec(this.currentCommand);
         this.addHistoryItem({
           role: 'system',
-          content: result ? `Command returned: ${result}` : 'Unable to execute command',
+          content: result ? `Command returned:\n${result}` : 'Unable to execute command',
           stamp: new Date(),
         });
       } finally {
         this.executing = false;
       }
-    },
-
-    async summaryText(text: string) {
-      text = text.trim();
-      if (!text) {
-        throw new Error('Summary failed: empty text');
-      }
-
-      const chunks = splitText(text);
-
-      const index = 0;
-      const summaries = [];
-      for (const chunk of chunks) {
-        const result = await this.openai.createChatCompletion({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              'role': 'user',
-              'content': 'Please summarize the following website text, do not describe the general website, but instead concisely extract the specific information this page contains: \n' +
-                chunk
-            },
-          ],
-          max_tokens: 300,
-        });
-
-        const summary = result.data.choices[0].message?.['content'];
-        console.log(`Summary of chunk ${index}: ${summary}`)
-
-        summaries.push(summary);
-      }
-
-      const finalResult = await this.openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            'role': 'user',
-            'content': 'Please summarize the following website text, do not describe the general website, but instead concisely extract the specific information this page contains: \n' +
-              summaries.join('\n')
-          },
-        ],
-        max_tokens: 300,
-      });
-
-      if (finalResult.data.choices[0].message?.['content']) {
-        this.addHistoryItem({
-          ...finalResult.data.choices[0].message,
-          stamp: new Date(),
-        })
-      }
-
-      return finalResult.data.choices[0].message?.['content'];
     },
 
     addBasicPrompt(content: string) {
