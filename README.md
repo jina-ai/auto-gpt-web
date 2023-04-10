@@ -13,6 +13,7 @@ Inspired by [Auto-GPT](https://github.com/Torantulino/Auto-GPT).
 - [ ] Long-Term memory (based on browser-based vector database)
 - [ ] Electron Application
 - [ ] Using Electron webview to conduct search operations (remove google search api limitation and solve SPA problem)
+- [ ] Calculate tokens and evaluate cost
 
 ## Requirements
 
