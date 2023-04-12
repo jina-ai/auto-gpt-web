@@ -1,14 +1,6 @@
 import { getWebsiteSummary } from '../prompt';
 import { useChatStore } from '../stores/chat';
 
-const PROXY = 'https://young-stream-68812.herokuapp.com'
-
-const fetchContent = async (url: string) => {
-  const response = await fetch(`${PROXY}/${url}`);
-  const html = await response.text();
-  return html;
-}
-
 const extractText = (html: string) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
@@ -109,7 +101,7 @@ const summaryText = async (text: string, question: string) => {
  * @param url website url
  */
 export const browse = async (url: string, question: string) => {
-  const html = await fetchContent(url);
+  const html = await window.electronAPI.fetchHtmlString(url);
   const text = extractText(html);
 
   const summary = await summaryText(text, question);

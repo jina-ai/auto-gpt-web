@@ -7,3 +7,13 @@ declare namespace NodeJS {
     VUE_ROUTER_BASE: string | undefined;
   }
 }
+
+export interface IElectronAPI {
+  fetchHtmlString: (url: string) => Promise<string>;
+}
+
+declare global {
+  interface Window {
+    electronAPI: IElectronAPI;
+  }
+}
