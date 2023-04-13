@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia';
-import { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } from 'openai';
+import {
+  Configuration,
+  OpenAIApi,
+  ChatCompletionRequestMessageRoleEnum,
+} from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useCredentialStore } from './credential';
@@ -38,10 +42,45 @@ interface Chat {
   history: HistoryItem[];
 }
 
-const createChatMsg = (role: ChatCompletionRequestMessageRoleEnum, content: string) => {
-  return { role, content }
+const createChatMsg = (
+  role: ChatCompletionRequestMessageRoleEnum,
+  content: string
+) => {
+  return { role, content };
 };
 
+const getContent = (
+  role: ChatCompletionRequestMessageRoleEnum,
+  content: string
+) => {
+  return role === ChatCompletionRequestMessageRoleEnum.Assistant
+    ? `\`\`\`json
+  ${content}
+  \`\`\``
+    : content;
+};
+
+const getChatMsg = ({
+  id,
+  role,
+  content,
+}: {
+  id?: string;
+  role: ChatCompletionRequestMessageRoleEnum;
+  content: string;
+}) => {
+  return {
+    id: id || uuidv4(),
+    role,
+    content: getContent(role, content),
+    stamp: new Date(),
+  };
+};
+
+const getCommandResultMsg = (result: string) => {
+  return `Command returned:\n
+${result.split(',').join('\n\n')}`;
+};
 export const useChatStore = defineStore('chat', {
   state: (): Chat => {
     return {
@@ -50,7 +89,7 @@ export const useChatStore = defineStore('chat', {
       executing: false,
       currentCommandJson: '',
       history: [],
-    }
+    };
   },
   getters: {
     openai(): OpenAIApi {
@@ -98,17 +137,19 @@ export const useChatStore = defineStore('chat', {
       }
 
       return null;
-    }
+    },
   },
   actions: {
-    async chat(list?: { role: ChatCompletionRequestMessageRoleEnum, content: string }[]) {
+    async chat(
+      list?: { role: ChatCompletionRequestMessageRoleEnum; content: string }[]
+    ) {
       list?.forEach(({ role, content }) => {
         this.addHistoryItem({
           role,
           content: content,
           stamp: new Date(),
-        })
-      })
+        });
+      });
 
       this.thinking = true;
       try {
@@ -120,10 +161,11 @@ export const useChatStore = defineStore('chat', {
         });
 
         if (result.data.choices[0].message?.['content']) {
-          this.addHistoryItem({
-            ...result.data.choices[0].message,
-            stamp: new Date(),
-          })
+          this.addHistoryItem(
+            getChatMsg({
+              ...result.data.choices[0].message,
+            })
+          );
 
           this.currentCommandJson = result.data.choices[0].message?.['content'];
         }
@@ -145,7 +187,9 @@ export const useChatStore = defineStore('chat', {
         const result = await exec(this.currentCommand);
         this.addHistoryItem({
           role: 'system',
-          content: result ? `Command returned:\n${result}` : 'Unable to execute command',
+          content: result
+            ? getCommandResultMsg(result)
+            : 'Unable to execute command',
           stamp: new Date(),
         });
       } finally {
@@ -154,22 +198,21 @@ export const useChatStore = defineStore('chat', {
     },
 
     addBasicPrompt(content: string) {
-      this.history.unshift({
-        id: uuidv4(),
-        role: 'system',
-        content: content,
-        stamp: new Date(),
-      }, {
-        id: uuidv4(),
-        role: 'system',
-        content: 'Permanent memory: []',
-        stamp: new Date(),
-      }, {
-        id: uuidv4(),
-        role: 'user',
-        content: 'Determine which next command to use, and respond using the format specified above:',
-        stamp: new Date(),
-      })
+      this.history.unshift(
+        getChatMsg({
+          role: 'system',
+          content: content,
+        }),
+        getChatMsg({
+          role: 'system',
+          content: 'Permanent memory: []',
+        }),
+        getChatMsg({
+          role: 'user',
+          content:
+            'Determine which next command to use, and respond using the format specified above:',
+        })
+      );
     },
 
     addHistoryItem(item: Omit<HistoryItem, 'id'>) {
