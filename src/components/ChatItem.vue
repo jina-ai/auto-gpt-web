@@ -1,13 +1,15 @@
 <template>
   <!-- TODO: render in a nicer way -->
-  <div>{{ content }}</div>
+  <Markdown class="chat-item-content" :source="content"></Markdown>
 </template>
 
 <script lang="ts" setup>
+import Markdown from 'vue3-markdown-it';
+
 defineProps({
   content: {
     type: String,
     required: true,
   },
-})
+});
 </script>

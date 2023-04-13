@@ -29,6 +29,7 @@ PERFORMANCE EVALUATION:
 You should only respond in JSON format as described below
 
 RESPONSE FORMAT:
+\`\`\`json
 {
     "command": {
         "name": "command name",
@@ -44,9 +45,9 @@ RESPONSE FORMAT:
         "speak": "thoughts summary to say to user"
     }
 }
-
+\`\`\`
 Ensure the response can be parsed by Javascript JSON.parse() function.
-`
+`;
 
 export const getWebsiteSummary = (content: string, question?: string) => {
   return `"""
@@ -55,4 +56,4 @@ ${content}
 
 Using the above text, please answer the following question: "${question}" -- if the question cannot be answered using the text, please summarize the text.
 `;
-}
+};
